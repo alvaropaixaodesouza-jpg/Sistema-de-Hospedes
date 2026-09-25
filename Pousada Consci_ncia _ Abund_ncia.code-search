@@ -1,0 +1,26 @@
+# Query: Pousada Consciência & Abundância
+# Flags: RegExp
+
+8 results - 7 files
+
+.env:
+  6: VITE_POUSADA_NAME="Anne's Pousada"
+
+.env.example:
+  6: VITE_POUSADA_NAME="Anne's Pousada"
+
+index.html:
+  9:     <title>Sistema de Gestão de Hóspedes - Anne's Pousada</title>
+
+src\components\layout\Header.tsx:
+  38:             <h1>Anne's Pousada</h1>
+
+src\components\layout\Topbar.tsx:
+  166:             <h1 className="pousada-title">Anne's Pousada</h1>
+
+src\lib\storageStore.ts:
+  13:   name: 'Anne\'s Pousada',
+
+supabase\migrations\20260924000000_initial_schema.sql:
+  12:     name TEXT NOT NULL DEFAULT 'Anne\'s Pousada',
+  26: SELECT 'Anne\'s Pousada', 'America/Bahia'

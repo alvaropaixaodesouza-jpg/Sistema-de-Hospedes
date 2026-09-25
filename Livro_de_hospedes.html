@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<!-- saved from url=(0090)file:///C:/Users/alvar/AppData/Local/Temp/codex-file-preview-DCyyHE/livro-de-hospedes.html -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#102c26">
+    <title>Livro de Hóspedes</title>
+    <style>
+:root {
+  --ink: #102c26;
+  --ink-2: #3e564f;
+  --cream: #f5f1e9;
+  --paper: #fffdf8;
+  --line: #dfddd5;
+  --sage: #dfe9df;
+  --accent: #d86f45;
+  --success: #2f745d;
+  --shadow: 0 18px 50px rgba(16, 44, 38, 0.08);
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; color: var(--ink); background: var(--cream); font-family: "DM Sans", sans-serif; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+.topbar { height: 76px; padding: 0 max(24px, calc((100vw - 1240px) / 2)); display: flex; align-items: center; justify-content: space-between; background: rgba(255,253,248,.92); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; backdrop-filter: blur(12px); }
+.brand, .brand > div, .header-actions, .card-heading > div, .records-header > div { display: flex; align-items: center; }
+.brand { gap: 12px; }
+.brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; color: var(--paper); background: var(--ink); font: 600 22px/1 "Newsreader", serif; }
+.brand > div { align-items: flex-start; flex-direction: column; line-height: 1.1; }
+.brand strong { font-size: 14px; }
+.brand small { margin-top: 4px; color: #75847f; font-size: 11px; }
+.header-actions { gap: 10px; }
+.private-pill { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid #bfd1c7; border-radius: 999px; color: var(--success); background: #eff7f1; font-size: 12px; font-weight: 700; }
+.private-pill i { width: 7px; height: 7px; background: var(--success); border-radius: 50%; box-shadow: 0 0 0 3px rgba(47,116,93,.12); }
+.ghost-button, .secondary-button { color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 10px; padding: 9px 13px; font-weight: 600; font-size: 12px; }
+main { width: min(1240px, calc(100% - 48px)); margin: 0 auto; padding: 56px 0 72px; }
+.hero { display: flex; align-items: end; justify-content: space-between; margin-bottom: 36px; }
+.eyebrow { display: block; margin-bottom: 13px; color: var(--accent); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+h1 { margin: 0; font: 600 clamp(40px, 5vw, 64px)/.95 "Newsreader", serif; letter-spacing: -.035em; }
+.hero p { max-width: 520px; margin: 18px 0 0; color: var(--ink-2); line-height: 1.6; }
+.stat-card { min-width: 168px; padding: 22px 24px; color: #fff; background: var(--ink); border-radius: 18px; box-shadow: var(--shadow); }
+.stat-card span { display: block; font: 600 38px/1 "Newsreader", serif; }
+.stat-card small { display: block; margin-top: 7px; color: #bed0c9; }
+.workspace { display: grid; grid-template-columns: .8fr 1.2fr; gap: 18px; align-items: start; }
+.card { background: var(--paper); border: 1px solid rgba(16,44,38,.1); border-radius: 20px; box-shadow: var(--shadow); }
+.search-panel, .form-panel { padding: 28px; }
+.card-heading { margin-bottom: 22px; }
+.card-heading.horizontal { display: flex; justify-content: space-between; align-items: center; }
+.card-heading > div, .records-header > div { gap: 10px; }
+.card-heading h2, .records-header h2 { margin: 0; font: 600 23px/1 "Newsreader", serif; }
+.card-heading p { margin: 8px 0 0 38px; color: #71817b; font-size: 12px; }
+.step { display: grid; place-items: center; width: 28px; height: 28px; color: var(--accent); background: #f9e9df; border-radius: 9px; font-size: 10px; font-weight: 700; }
+.search-box { display: grid; grid-template-columns: 28px 1fr 28px; align-items: center; padding: 7px 9px 7px 14px; border: 1.5px solid #cfd5d1; border-radius: 13px; background: white; }
+.search-box:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(16,44,38,.08); }
+.search-box > span { font-size: 23px; transform: rotate(-15deg); }
+.search-box input { min-width: 0; padding: 8px 4px; border: 0; outline: 0; color: var(--ink); background: transparent; }
+.search-box button { display: none; width: 27px; height: 27px; border: 0; border-radius: 8px; color: #6e7d78; background: #f0f1ee; font-size: 18px; }
+.search-box.has-value button { display: block; }
+.search-state { min-height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #7b8884; text-align: center; }
+.search-state strong { margin: 14px 0 5px; color: var(--ink-2); font-size: 14px; }
+.search-state span { font-size: 12px; }
+.empty-illustration { width: 62px; height: 62px; display: grid; place-items: center; color: #70847d; background: var(--sage); border-radius: 50%; font-size: 28px; transform: rotate(-15deg); }
+.search-results { margin-top: 16px; }
+.result-item { width: 100%; padding: 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--ink); background: #f7f6f1; border: 1px solid transparent; border-radius: 12px; text-align: left; }
+.result-item + .result-item { margin-top: 8px; }
+.result-item:hover { border-color: #aebdb7; background: white; }
+.result-item strong, .result-item span { display: block; }
+.result-item span { margin-top: 4px; color: #73817c; font-size: 11px; }
+.result-item b { color: var(--accent); font-size: 18px; }
+.reuse-badge { padding: 7px 10px; color: var(--success); background: #e7f3eb; border-radius: 999px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.form-grid label { display: flex; flex-direction: column; gap: 7px; }
+.form-grid label > span, .date-filter > span { color: var(--ink-2); font-size: 11px; font-weight: 700; }
+.form-grid input, .form-grid textarea, .date-filter input { width: 100%; padding: 11px 12px; color: var(--ink); background: white; border: 1px solid #d7d7d0; border-radius: 10px; outline: none; }
+.form-grid input:focus, .form-grid textarea:focus, .date-filter input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(16,44,38,.07); }
+.form-grid input.invalid { border-color: #c74d46; }
+.form-grid small { min-height: 12px; color: #b33f38; font-size: 10px; }
+.wide { grid-column: 1 / -1; }
+.divider { position: relative; margin: 6px 0 0; border-top: 1px solid var(--line); }
+.divider span { position: relative; top: -8px; padding-right: 10px; color: #82908b; background: var(--paper); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; }
+.form-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.primary-button { min-width: 190px; padding: 12px 15px; display: flex; justify-content: space-between; color: white; background: var(--accent); border: 0; border-radius: 11px; font-weight: 700; box-shadow: 0 8px 18px rgba(216,111,69,.22); }
+.primary-button:hover { background: #c8603a; }
+.records { margin-top: 18px; padding: 28px; }
+.records-header { display: flex; align-items: end; justify-content: space-between; margin-bottom: 22px; }
+.date-filter { display: flex; align-items: center; gap: 10px; }
+.date-filter input { width: auto; }
+.records-list { display: grid; gap: 18px; }
+.day-group h3 { margin: 0 0 9px; color: #697b74; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+.record-row { display: grid; grid-template-columns: 70px 1.2fr 1fr 1fr; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid #e6e3dc; border-radius: 12px; background: #fff; }
+.record-time { color: var(--accent); font-weight: 700; }
+.record-person strong, .record-person span, .record-meta strong, .record-meta span { display: block; }
+.record-person span, .record-meta span { margin-top: 3px; color: #77857f; font-size: 10px; }
+.record-meta strong { font-size: 12px; }
+.empty-records { padding: 30px; color: #77857f; background: #f7f5ef; border-radius: 12px; text-align: center; font-size: 13px; }
+.toast { position: fixed; right: 24px; bottom: 24px; max-width: 360px; padding: 14px 18px; color: white; background: var(--ink); border-radius: 12px; box-shadow: var(--shadow); opacity: 0; transform: translateY(12px); pointer-events: none; transition: .25s; font-size: 13px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+@media (max-width: 840px) {
+  main { width: min(100% - 28px, 680px); padding-top: 34px; }
+  .workspace { grid-template-columns: 1fr; }
+  .hero { align-items: flex-start; gap: 20px; }
+  .stat-card { min-width: 130px; }
+  .record-row { grid-template-columns: 58px 1fr 1fr; }
+  .record-row .record-meta:last-child { display: none; }
+}
+@media (max-width: 560px) {
+  .topbar { height: 68px; padding: 0 14px; }
+  .brand small, .ghost-button { display: none; }
+  main { width: calc(100% - 20px); padding: 25px 0 50px; }
+  .hero { align-items: stretch; flex-direction: column; margin-bottom: 22px; }
+  h1 { font-size: 43px; }
+  .hero p { font-size: 13px; }
+  .stat-card { display: flex; align-items: center; gap: 10px; padding: 14px 16px; }
+  .stat-card span { font-size: 28px; }
+  .stat-card small { margin: 0; }
+  .search-panel, .form-panel, .records { padding: 20px 16px; border-radius: 16px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .wide { grid-column: auto; }
+  .card-heading.horizontal { align-items: flex-start; }
+  .reuse-badge { max-width: 105px; text-align: center; }
+  .form-footer { flex-direction: column-reverse; }
+  .form-footer button { width: 100%; }
+  .records-header { align-items: stretch; flex-direction: column; gap: 16px; }
+  .date-filter { justify-content: space-between; }
+  .record-row { grid-template-columns: 52px 1fr; gap: 10px; }
+  .record-meta { display: none; }
+  .toast { right: 12px; bottom: 12px; left: 12px; }
+}
+
+[hidden] { display: none !important; }
+
+</style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">H</span>
+        <div><strong>Livro de Hóspedes</strong><small>Recepção privada</small></div>
+      </div>
+      <div class="header-actions">
+        <span class="private-pill"><i></i> Versão local</span>
+        <button class="ghost-button" id="exportButton" title="Baixar cópia dos registros">Exportar backup</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="pageTitle">
+        <div>
+          <span class="eyebrow" id="todayLabel">quinta-feira, 24 de setembro de 2026</span>
+          <h1 id="pageTitle">Receba bem.<br>Registre em segundos.</h1>
+          <p>Localize quem já passou por aqui e reaproveite os dados no próximo check-in.</p>
+        </div>
+        <div class="stat-card"><span id="todayCount">0</span><small>chegadas hoje</small></div>
+      </section>
+
+      <p role="note">Armazenamento local: estes cadastros ficam neste navegador. A sincronização entre dispositivos ainda não está ativada.</p>
+      <section class="workspace">
+        <div class="search-panel card">
+          <div class="card-heading">
+            <div><span class="step">01</span><h2>Buscar hóspede</h2></div>
+            <p>Digite ao menos 4 números do CPF ou celular.</p>
+          </div>
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input id="guestSearch" inputmode="numeric" autocomplete="off" placeholder="CPF ou número de celular">
+            <button type="button" id="clearSearch" aria-label="Limpar busca">×</button>
+          </label>
+          <div id="searchState" class="search-state"><div class="empty-illustration" aria-hidden="true">⌕</div><strong>Pronto para pesquisar</strong><span>Digite ao menos 4 números do CPF ou celular.</span></div>
+          <div id="searchResults" class="search-results" hidden=""></div>
+        </div>
+
+        <form id="arrivalForm" class="form-panel card" novalidate="">
+          <div class="card-heading horizontal">
+            <div><span class="step">02</span><h2>Nova chegada</h2></div>
+            <span id="reuseBadge" class="reuse-badge" hidden="">Dados recuperados</span>
+          </div>
+          <input type="hidden" id="guestId" value="">
+          <div class="form-grid">
+            <label class="wide"><span>Nome completo *</span><input id="name" autocomplete="name" required="" placeholder="Nome do hóspede"></label>
+            <label><span>CPF *</span><input id="cpf" inputmode="numeric" autocomplete="off" required="" placeholder="000.000.000-00" maxlength="14"><small id="cpfError"></small></label>
+            <label><span>Celular *</span><input id="phone" inputmode="tel" autocomplete="tel" required="" placeholder="(00) 00000-0000" maxlength="15"></label>
+            <label class="wide"><span>Cidade / origem</span><input id="city" autocomplete="address-level2" placeholder="Ex.: Salvador, BA"></label>
+            <div class="divider wide"><span>Detalhes desta estadia</span></div>
+            <label><span>Data de chegada *</span><input id="arrivalDate" type="date" required=""></label>
+            <label><span>Horário *</span><input id="arrivalTime" type="time" required=""></label>
+            <label><span>Quarto / acomodação *</span><input id="room" required="" placeholder="Ex.: Suíte 03"></label>
+            <label><span>Nº de hóspedes</span><input id="partySize" type="number" min="1" max="30" value="1"></label>
+            <label class="wide"><span>Observações</span><textarea id="notes" rows="3" placeholder="Preferências, veículo ou informação útil para a recepção"></textarea></label>
+          </div>
+          <div class="form-footer"><button type="button" class="secondary-button" id="resetForm">Limpar</button><button class="primary-button" type="submit"><span>Confirmar chegada</span><b aria-hidden="true">→</b></button></div>
+        </form>
+      </section>
+
+      <section class="records card" aria-labelledby="recordsTitle">
+        <div class="records-header">
+          <div><span class="step">03</span><h2 id="recordsTitle">Registros por data</h2></div>
+          <label class="date-filter"><span>Filtrar dia</span><input id="dateFilter" type="date"></label>
+        </div>
+        <div id="recordsList" class="records-list"><div class="empty-records">Ainda não há chegadas registradas para este período.</div></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script>
+const onlyDigits = (value = "") => String(value).replace(/\D/g, "");
+
+function formatCPF(value = "") {
+  const digits = onlyDigits(value).slice(0, 11);
+  return digits
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
+function formatPhone(value = "") {
+  const digits = onlyDigits(value).slice(0, 11);
+  if (digits.length <= 10) {
+    return digits.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2");
+  }
+  return digits.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
+}
+
+function isValidCPF(value = "") {
+  const cpf = onlyDigits(value);
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+  const digit = (size) => {
+    let sum = 0;
+    for (let i = 0; i < size; i += 1) sum += Number(cpf[i]) * (size + 1 - i);
+    const result = (sum * 10) % 11;
+    return result === 10 ? 0 : result;
+  };
+  return digit(9) === Number(cpf[9]) && digit(10) === Number(cpf[10]);
+}
+
+function findGuests(guests, query) {
+  const digits = onlyDigits(query);
+  if (digits.length < 4) return [];
+  return guests.filter((guest) =>
+    onlyDigits(guest.cpf).includes(digits) || onlyDigits(guest.phone).includes(digits)
+  );
+}
+
+// Telefone pode ser compartilhado: somente CPF identifica automaticamente.
+function findExistingGuest(guests, cpf, phone) {
+  const digits = onlyDigits(cpf);
+  if (!isValidCPF(digits)) return undefined;
+  return guests.find((guest) => onlyDigits(guest.cpf) === digits);
+}
+
+function mergeGuest(existing, incoming) {
+  return {
+    ...(existing || {}),
+    ...incoming,
+    id: existing?.id || incoming.id,
+    createdAt: existing?.createdAt || incoming.createdAt,
+    updatedAt: incoming.updatedAt,
+  };
+}
+
+function groupStaysByDate(stays) {
+  return [...stays]
+    .sort((a, b) => `${b.arrivalDate}T${b.arrivalTime}`.localeCompare(`${a.arrivalDate}T${a.arrivalTime}`))
+    .reduce((groups, stay) => {
+      (groups[stay.arrivalDate] ||= []).push(stay);
+      return groups;
+    }, {});
+}
+
+function maskCPF(value = "") {
+  const cpf = onlyDigits(value);
+  return cpf.length === 11 ? `***.${cpf.slice(3, 6)}.${cpf.slice(6, 9)}-**` : "CPF não informado";
+}
+
+function maskPhone(value = "") {
+  const phone = onlyDigits(value);
+  return phone.length >= 10 ? `(${phone.slice(0, 2)}) *****-${phone.slice(-4)}` : "Celular não informado";
+}
+
+function isoToday(now = new Date()) {
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
+}
+
+function makeId(prefix = "id") {
+  return `${prefix}_${Date.now().toString(36)}_${crypto.randomUUID().slice(0, 8)}`;
+}
+
+const STORAGE_KEY = "livro_hospedes_v1";
+const $ = (id) => document.getElementById(id);
+const fields = ["guestId", "name", "cpf", "phone", "city", "arrivalDate", "arrivalTime", "room", "partySize", "notes"];
+let db = loadData();
+
+function loadData() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (parsed && Array.isArray(parsed.guests) && Array.isArray(parsed.stays)) return parsed;
+  } catch {}
+  return { guests: [], stays: [] };
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+}
+
+function escapeHTML(value = "") {
+  return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
+}
+
+function prettyDate(date) {
+  if (!date) return "";
+  return new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`));
+}
+
+function showToast(message) {
+  const toast = $("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => toast.classList.remove("show"), 3200);
+}
+
+function resetForm() {
+  $("arrivalForm").reset();
+  $("guestId").value = "";
+  $("arrivalDate").value = isoToday();
+  $("arrivalTime").value = new Date().toTimeString().slice(0, 5);
+  $("partySize").value = 1;
+  $("reuseBadge").hidden = true;
+  $("cpf").classList.remove("invalid");
+  $("cpfError").textContent = "";
+}
+
+function selectGuest(id) {
+  const guest = db.guests.find((item) => item.id === id);
+  if (!guest) return;
+  $("guestId").value = guest.id;
+  $("name").value = guest.name || "";
+  $("cpf").value = formatCPF(guest.cpf);
+  $("phone").value = formatPhone(guest.phone);
+  $("city").value = guest.city || "";
+  $("reuseBadge").hidden = false;
+  $("room").focus();
+  const visits = db.stays.filter((stay) => stay.guestId === id).length;
+  showToast(`Dados recuperados. ${visits} estadia${visits === 1 ? " anterior" : "s anteriores"}.`);
+}
+
+function renderSearch() {
+  const query = $("guestSearch").value;
+  const results = findGuests(db.guests, query);
+  $("guestSearch").parentElement.classList.toggle("has-value", Boolean(query));
+  if (onlyDigits(query).length < 4) {
+    $("searchState").hidden = false;
+    $("searchResults").hidden = true;
+    $("searchState").innerHTML = '<div class="empty-illustration" aria-hidden="true">⌕</div><strong>Pronto para pesquisar</strong><span>Digite ao menos 4 números do CPF ou celular.</span>';
+    return;
+  }
+  if (!results.length) {
+    $("searchState").hidden = false;
+    $("searchResults").hidden = true;
+    $("searchState").innerHTML = '<div class="empty-illustration" aria-hidden="true">＋</div><strong>Nenhum hóspede encontrado</strong><span>Preencha o formulário para fazer o primeiro cadastro.</span>';
+    return;
+  }
+  $("searchState").hidden = true;
+  $("searchResults").hidden = false;
+  $("searchResults").innerHTML = results.map((guest) => {
+    const visits = db.stays.filter((stay) => stay.guestId === guest.id).length;
+    return `<button class="result-item" type="button" data-id="${guest.id}"><div><strong>${escapeHTML(guest.name)}</strong><span>${maskCPF(guest.cpf)} · ${maskPhone(guest.phone)} · ${visits} visita${visits === 1 ? "" : "s"}</span></div><b>→</b></button>`;
+  }).join("");
+}
+
+function renderRecords() {
+  const selectedDate = $("dateFilter").value;
+  const filtered = selectedDate ? db.stays.filter((stay) => stay.arrivalDate === selectedDate) : db.stays;
+  const grouped = groupStaysByDate(filtered);
+  const list = $("recordsList");
+  $("todayCount").textContent = db.stays.filter((stay) => stay.arrivalDate === isoToday()).length;
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-records">Ainda não há chegadas registradas para este período.</div>';
+    return;
+  }
+  list.innerHTML = Object.entries(grouped).map(([date, stays]) => `
+    <div class="day-group">
+      <h3>${escapeHTML(prettyDate(date))} · ${stays.length} chegada${stays.length === 1 ? "" : "s"}</h3>
+      ${stays.map((stay) => {
+        const guest = db.guests.find((item) => item.id === stay.guestId) || {};
+        return `<article class="record-row">
+          <div class="record-time">${escapeHTML(stay.arrivalTime)}</div>
+          <div class="record-person"><strong>${escapeHTML(guest.name || "Hóspede")}</strong><span>${maskCPF(guest.cpf)} · ${maskPhone(guest.phone)}</span></div>
+          <div class="record-meta"><strong>${escapeHTML(stay.room)}</strong><span>Acomodação</span></div>
+          <div class="record-meta"><strong>${Number(stay.partySize) || 1}</strong><span>Hóspedes</span></div>
+        </article>`;
+      }).join("")}
+    </div>`).join("");
+}
+
+function submitArrival(event) {
+  event.preventDefault();
+  const form = $("arrivalForm");
+  if (!form.reportValidity()) return;
+  if (!isValidCPF($("cpf").value)) {
+    $("cpf").classList.add("invalid");
+    $("cpfError").textContent = "Confira o CPF: os dígitos não são válidos.";
+    $("cpf").focus();
+    return;
+  }
+  if (!$("name").value.trim() || !$("room").value.trim()) {
+    showToast("Preencha nome e acomodação.");
+    return;
+  }
+  if (![10, 11].includes(onlyDigits($("phone").value).length)) {
+    showToast("Informe o telefone com DDD e 10 ou 11 dígitos.");
+    return;
+  }
+  const selected = db.guests.find(g => g.id === $("guestId").value);
+  if (selected && onlyDigits(selected.cpf) !== onlyDigits($("cpf").value)) {
+    showToast("O CPF difere do hóspede selecionado. Limpe o formulário para cadastrar outra pessoa.");
+    return;
+  }
+  const previous = structuredClone(db);
+  const now = new Date().toISOString();
+  const incoming = {
+    id: $("guestId").value || makeId("guest"),
+    name: $("name").value.trim(),
+    cpf: onlyDigits($("cpf").value),
+    phone: onlyDigits($("phone").value),
+    city: $("city").value.trim(),
+    createdAt: now,
+    updatedAt: now,
+  };
+  const existing = db.guests.find((g) => g.id === incoming.id) || findExistingGuest(db.guests, incoming.cpf, incoming.phone);
+  const guest = mergeGuest(existing, incoming);
+  if (existing) db.guests = db.guests.map((item) => item.id === existing.id ? guest : item);
+  else db.guests.push(guest);
+  db.stays.push({
+    id: makeId("stay"), guestId: guest.id,
+    arrivalDate: $("arrivalDate").value,
+    arrivalTime: $("arrivalTime").value,
+    room: $("room").value.trim(),
+    partySize: Number($("partySize").value) || 1,
+    notes: $("notes").value.trim(), createdAt: now,
+  });
+  try { saveData(); }
+  catch {
+    db = previous;
+    showToast("Não foi possível salvar. Seus dados continuam no formulário; verifique o armazenamento do navegador.");
+    return;
+  }
+  renderRecords();
+  renderSearch();
+  resetForm();
+  showToast(existing ? "Nova chegada registrada com os dados anteriores." : "Hóspede e chegada cadastrados com sucesso.");
+}
+
+function exportBackup() {
+  const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), ...db }, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `backup-hospedes-${isoToday()}.json`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast("Backup baixado com sucesso.");
+}
+
+$("guestSearch").addEventListener("input", renderSearch);
+$("clearSearch").addEventListener("click", () => { $("guestSearch").value = ""; renderSearch(); $("guestSearch").focus(); });
+$("searchResults").addEventListener("click", (event) => { const button = event.target.closest("[data-id]"); if (button) selectGuest(button.dataset.id); });
+$("cpf").addEventListener("input", (event) => { event.target.value = formatCPF(event.target.value); event.target.classList.remove("invalid"); $("cpfError").textContent = ""; });
+$("phone").addEventListener("input", (event) => { event.target.value = formatPhone(event.target.value); });
+$("arrivalForm").addEventListener("submit", submitArrival);
+$("resetForm").addEventListener("click", resetForm);
+$("dateFilter").addEventListener("change", renderRecords);
+$("exportButton").addEventListener("click", exportBackup);
+
+$("todayLabel").textContent = prettyDate(isoToday());
+resetForm();
+renderSearch();
+renderRecords();
+
+</script>
+  
+
+</body></html>
