@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ActiveSection, Guest, Room, Stay } from '../../types';
 import { dataService } from '../../lib/storageStore';
 import { 
-  getOperationalDateString, 
+  getOperationalDateString, getOperationalTimeString,
   formatDatePTBR, 
   formatDateTimePTBR, 
   formatCurrency, 
@@ -286,7 +286,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
                         <span className="room-pill">{stay.room?.number_name || 'Quarto'}</span>
                       </div>
                       <div className="feed-item-meta">
-                        <span>Horário: {stay.check_in_expected.split('T')[1]?.substring(0, 5) || '14:00'}</span>
+                        <span>Horário: {getOperationalTimeString(stay.check_in_expected)}</span>
                         <span>{stay.party_size} pessoa(s)</span>
                         <strong>{formatCurrency(stay.agreed_amount)}</strong>
                       </div>
@@ -315,7 +315,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
                         <span className="room-pill">{stay.room?.number_name || 'Quarto'}</span>
                       </div>
                       <div className="feed-item-meta">
-                        <span>Saída até: {stay.check_out_expected.split('T')[1]?.substring(0, 5) || '12:00'}</span>
+                        <span>Saída até: {getOperationalTimeString(stay.check_out_expected)}</span>
                         <span className={`status-badge-sm ${stay.status}`}>{stay.status}</span>
                       </div>
                     </div>

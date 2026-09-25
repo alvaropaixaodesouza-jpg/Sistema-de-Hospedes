@@ -168,8 +168,8 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                       {dateColumns.map(col => {
                         // Check if a stay overlaps this date column
                         const activeStay = roomStays.find(s => {
-                          const checkIn = s.check_in_expected.split('T')[0];
-                          const checkOut = s.check_out_expected.split('T')[0];
+                          const checkIn = getOperationalDateString(s.check_in_expected);
+                          const checkOut = getOperationalDateString(s.check_out_expected);
                           return col.dateStr >= checkIn && col.dateStr < checkOut;
                         });
 

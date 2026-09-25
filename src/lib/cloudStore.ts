@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { Guest, Stay, Room, Payment, UserProfile } from '../types';
+import { ImportBatch } from './importData';
 import { notifyDataChanged } from './storeEvents';
 
 async function profile(write = false): Promise<UserProfile> {
@@ -24,6 +25,39 @@ async function rows(table: string, select = '*'): Promise<any[]> {
 }
 
 export const cloudStore = {
+  async importDataBatch(payload: ImportBatch & { filename: string }) {
+    await profile(true);
+    const { data, error } = await supabase.rpc('import_guest_batch', { payload });
+    if (error) {
+      if (error.code === 'PGRST202' || error.code === '42883') throw new Error('A importação precisa ser ativada no banco. Aplique a migração 20260925170000_excel_import.sql no Supabase e tente novamente.');
+      throw error;
+    }
+    notifyDataChanged();
+    return data;
+  },
+  async roomTypes() { return rows('room_types'); },
+  async saveRoomType(value: { id?: string; name: string; description?: string; default_price: number }) {
+    const actor = await profile(true);
+    const { id, ...fields } = value;
+    const query = id ? supabase.from('room_types').update(fields).eq('id',id) : supabase.from('room_types').insert({...fields,pousada_id:actor.pousada_id});
+    const { data, error } = await query.select().single();
+    if (error) throw error; notifyDataChanged(); return data;
+  },
+  async importHistory() { return (await rows('import_history')).sort((a,b) => b.created_at.localeCompare(a.created_at)); },
+  async config() {
+    const actor = await profile();
+    const { data, error } = await supabase.from('pousada_config').select('*').eq('id', actor.pousada_id).single();
+    if (error) throw error;
+    return data;
+  },
+  async saveConfig(fields: Record<string, unknown>) {
+    const actor = await profile(true);
+    if (actor.role !== 'admin') throw new Error('Somente administradores podem alterar configurações.');
+    const { data, error } = await supabase.from('pousada_config').update(fields).eq('id', actor.pousada_id).select().single();
+    if (error) throw error;
+    notifyDataChanged();
+    return data;
+  },
   async guests(): Promise<Guest[]> { return rows('guests'); },
   async stays(): Promise<Stay[]> {
     return rows('stays', '*, guest:guests(*), room:rooms(*), payments(*), companions:stay_guests(*)');

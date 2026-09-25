@@ -1,45 +1,18 @@
-const CACHE_NAME = 'pousada-hospedes-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest'
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
-  );
-  self.skipWaiting();
+const CACHE_NAME = 'pousada-hospedes-v2';
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', event => {
+  event.waitUntil(Promise.all([
+    caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('pousada-hospedes-') && k !== CACHE_NAME).map(k => caches.delete(k)))),
+    self.clients.claim()
+  ]));
 });
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', (event) => {
-  // Avoid caching API/Supabase requests
-  if (event.request.url.includes('/rest/v1/') || event.request.url.includes('supabase.co')) {
-    return;
-  }
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).catch(() => {
-        return caches.match('/index.html');
-      });
-    })
-  );
+// HTML must be refreshed from the network so published fixes reach installed PWAs.
+// Never return HTML for a missing JS/CSS resource or cache authenticated data.
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET' || url.origin !== self.location.origin || event.request.mode !== 'navigate') return;
+  event.respondWith(fetch(event.request).then(response => {
+    if (response.ok) { const copy = response.clone(); event.waitUntil(caches.open(CACHE_NAME).then(c => c.put('/index.html', copy))); }
+    return response;
+  }).catch(async () => (await caches.match('/index.html')) || Response.error()));
 });

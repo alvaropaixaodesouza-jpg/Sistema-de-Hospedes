@@ -1,3 +1,4 @@
+import { usePousadaConfig } from '../../lib/usePousadaConfig';
 import React, { useState, useEffect } from 'react';
 import { Guest, Room, StayStatus } from '../../types';
 import { dataService } from '../../lib/storageStore';
@@ -19,6 +20,7 @@ export const NewStayModal: React.FC<NewStayModalProps> = ({
   defaults,
   onSave
 }) => {
+  const config = usePousadaConfig();
   const [guest, setGuest] = useState<Guest | null>(initialGuest);
   const [guestQuery, setGuestQuery] = useState('');
   const [guestOptions, setGuestOptions] = useState<Guest[]>([]);
@@ -51,8 +53,8 @@ export const NewStayModal: React.FC<NewStayModalProps> = ({
       tomorrow.setDate(tomorrow.getDate() + 1);
       setCheckOutDate(defaults?.checkOutDate || getOperationalDateString(tomorrow));
       setCheckInDate(defaults?.checkInDate || getOperationalDateString());
-      setCheckInTime(defaults?.status === 'reservada' ? '14:00' : getOperationalTimeString());
-      setCheckOutTime('12:00');
+      setCheckInTime(defaults?.status === 'reservada' ? (config?.default_checkin_time?.slice(0,5) || '14:00') : getOperationalTimeString());
+      setCheckOutTime(config?.default_checkout_time?.slice(0,5) || '12:00');
       setNotes('');
       setSubmitError('');
     }
@@ -77,7 +79,7 @@ export const NewStayModal: React.FC<NewStayModalProps> = ({
         setSelectedRoomId(defaults?.roomId || '');
       }
     } catch (err) {
-      console.error('Error loading rooms:', err);
+      setSubmitError(`Falha ao carregar quartos: ${(err as Error).message}`);
     }
   };
 

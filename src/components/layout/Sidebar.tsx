@@ -1,3 +1,4 @@
+import { usePousadaConfig } from '../../lib/usePousadaConfig';
 import React from 'react';
 import { ActiveSection } from '../../types';
 import { 
@@ -35,6 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenNewGuest,
   onOpenNewStay
 }) => {
+  const config = usePousadaConfig();
   const [hospedagensExpanded, setHospedagensExpanded] = React.useState(
     activeSection.startsWith('hospedagens')
   );
@@ -127,7 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span>P</span>
           </div>
           <div className="brand-info">
-            <span className="brand-name">Consciência & Abundância</span>
+            <span className="brand-name">{config?.name || 'Pousada'}</span>
             <span className="brand-badge">PMS Recepção</span>
           </div>
           {isMobileOpen && (
