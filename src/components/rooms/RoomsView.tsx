@@ -1,10 +1,11 @@
 import { useDataRefresh } from '../../lib/useDataRefresh';
 import React, { useState, useEffect } from 'react';
-import { Room, RoomOperationalStatus, Stay } from '../../types';
+import { Room, RoomOperationalStatus, RoomType, Stay } from '../../types';
 import { dataService } from '../../lib/storageStore';
 import { BedDouble, Plus, ShieldAlert, Sparkles, Wrench, Lock, CheckCircle, RefreshCw } from 'lucide-react';
 
 export const RoomsView: React.FC = () => {
+  const [types, setTypes] = useState<RoomType[]>([]);
   const [stays, setStays] = useState<Stay[]>([]);
   const [error, setError] = useState('');
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -32,6 +33,7 @@ export const RoomsView: React.FC = () => {
       setStays(stays);
       setError('');
       setRooms(list);
+      setTypes(await dataService.fetchRoomTypes());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Não foi possível carregar os quartos.');
     } finally {
@@ -67,6 +69,7 @@ export const RoomsView: React.FC = () => {
         capacity: Number(capacity) || 2,
         status: status,
         room_type_name: roomTypeName,
+        room_type_id: types.find(t=>t.name === roomTypeName)?.id || null as any,
         notes: notes.trim()
       });
       setIsModalOpen(false);
@@ -190,9 +193,10 @@ export const RoomsView: React.FC = () => {
                 </div>
 
                 <div className="form-group" style={{ marginBottom: '12px' }}>
-                  <label>Tipo de Acomodação</label>
+                  <label>Tipo de Acomodação</label><datalist id="room-types">{types.map(t=><option key={t.id} value={t.name} />)}</datalist>
                   <input
                     className="form-control"
+                    list="room-types"
                     placeholder="Ex.: Suíte Luxo, Chalé, Standard"
                     value={roomTypeName}
                     onChange={(e) => setRoomTypeName(e.target.value)}

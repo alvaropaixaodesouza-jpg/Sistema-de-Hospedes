@@ -1,3 +1,4 @@
+import { usePousadaConfig } from '../../lib/usePousadaConfig';
 import { useDataRefresh } from '../../lib/useDataRefresh';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -39,6 +40,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   onOpenNewGuest,
   onOpenNewStay
 }) => {
+  const config = usePousadaConfig();
   const { user, isConfigured, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<{
@@ -163,7 +165,7 @@ export const Topbar: React.FC<TopbarProps> = ({
             <Building2 size={18} />
           </div>
           <div>
-            <h1 className="pousada-title">Pousada Consciência & Abundância</h1>
+            <h1 className="pousada-title">{config?.name || 'Pousada'}</h1>
             <span className="pousada-sub">Recepção Central · Fuso Salvador (-03:00)</span>
           </div>
         </div>

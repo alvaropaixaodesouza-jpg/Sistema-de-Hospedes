@@ -117,3 +117,81 @@ test('Supabase indisponível não faz fallback para registros locais', async () 
   for (const call of [() => service.fetchGuests({}), () => service.fetchStays({}), () => service.fetchRooms(), () => service.fetchPayments(), () => service.saveStay({}), () => service.savePayment({})]) await assert.rejects(call(), /Banco indisponível/);
   assert.equal(memory.size, 0);
 });
+
+test('Excel original preserva endereço, documento alternativo, valor e acompanhantes', () => {
+  const { imports } = setup();
+  const batch = imports.normalizeRows([{ Nome:'Pessoa teste', 'CPF / documento':'123456789', Telefone:'(71) 90000-0000', Endereço:'Rua teste', Número:'0', Bairro:'Centro', 'Cidade / origem informada':'Saubara', CEP:'00000-001', 'Contato de emergência':'Contato 123', Acompanhantes:'Pessoa B (000.000.000-00), Pessoa C', 'Valor informado':'R$ 1.234,50', Entrada:'12/09/2026', Saída:'14/09/2026', 'Quarto / unidade':'Quarto 01' }]);
+  assert.equal(batch.guests[0].street,'Rua teste');
+  assert.equal(batch.guests[0].alt_doc_number,'123456789');
+  assert.equal(batch.guests[0].cpf,'');
+  assert.match(batch.guests[0].preferences,/Contato de emergência/);
+  assert.equal(batch.stays[0].agreed_amount,1234.5);
+  assert.equal(batch.stays[0].companions.length,2);
+  assert.equal(batch.stays[0].party_size,3);
+});
+
+test('Excel não inventa ano, não descarta cliente e informa estadias ambíguas', () => {
+  const { imports } = setup();
+  const batch = imports.normalizeRows([
+    {Nome:'A',Entrada:'16/01',Quarto:'A'},
+    {Nome:'B',Entrada:'01/01/2026',Saída:'31/12/2025',Quarto:'A'},
+    {Nome:'C',Entrada:'01/01/2026',Quarto:'04/06'},
+    {Nome:'D',Entrada:'01/01/2026',Quarto:'A','Valor informado':'R$ 250,00 / R$ 0,00'}
+  ]);
+  assert.equal(batch.guests.length,4); assert.equal(batch.stays.length,0);
+  assert.equal(batch.warnings.filter(w=>w.includes('não incluída')).length,4);
+  assert.match(batch.guests[0].preferences,/16\/01/);
+});
+
+test('lote com hash pode ser repetido, e outro lote não colide com IDs de linhas', async () => {
+  const { service, imports } = setup();
+  const batch = imports.normalizeRows([{Nome:'Cliente A',CPF:guest.cpf,Entrada:'01/01/2020',Quarto:'A'}]);
+  const params={...batch,batchKey:'a'.repeat(64),filename:'a.xlsx'};
+  assert.equal((await service.importDataBatch(params)).importedStaysCount,1);
+  assert.equal((await service.importDataBatch(params)).importedStaysCount,0);
+  const other=imports.normalizeRows([{Nome:'Cliente B',Entrada:'02/01/2020',Quarto:'B'}]);
+  assert.equal((await service.importDataBatch({...other,batchKey:'b'.repeat(64),filename:'b.xlsx'})).importedStaysCount,1);
+});
+
+test('importação cloud chama RPC e nunca salva cópia local', async () => {
+  let called;
+  const {service,memory}=setup({cloud:true,cloudStore:{importDataBatch:async p=>{called=p;return {importedGuestsCount:1,importedStaysCount:0};}}});
+  const params={filename:'teste.xlsx',batchKey:'c'.repeat(64),guests:[],stays:[]};
+  assert.equal((await service.importDataBatch(params)).importedGuestsCount,1);
+  assert.equal(called,params);assert.equal(memory.size,0);
+});
+
+test('configurações e tipos persistem no modo local e no backup', async () => {
+  const {service}=setup();const c=await service.fetchConfig();
+  await service.saveConfig({...c,name:'Pousada teste',default_checkin_time:'15:30'});
+  assert.equal((await service.fetchConfig()).default_checkin_time,'15:30');
+  await assert.rejects(service.saveConfig({...c,default_checkout_time:'25:00'}),/Horário/);
+  await service.saveRoomType({name:'Teste',default_price:123});
+  assert.equal((await service.fetchRoomTypes()).length,1);
+  const backup=JSON.parse(await service.exportFullDataJSON());
+  await service.restoreBackup(backup);
+  assert.equal((await service.fetchRoomTypes())[0].name,'Teste');
+});
+
+test('seletor Excel fica habilitado no Supabase para recepção e bloqueado para consulta', () => {
+  const React = require('react'); const {renderToStaticMarkup} = require('react-dom/server');
+  for(const [role,disabled] of [['recepcao',false],['consulta',true]]) {
+    const exports={};
+    const source=ts.transpileModule(fs.readFileSync('src/components/data/DataImportExportView.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.React,target:ts.ScriptTarget.ES2020,esModuleInterop:true}}).outputText;
+    vm.runInNewContext(source,{exports,require:name=>{
+      if(name.includes('context/AuthContext'))return {useAuth:()=>({user:{active:true,role}})};
+      if(name.includes('lib/supabase'))return {isSupabaseConfigured:true};
+      if(name.startsWith('.'))return {};
+      return require(name);
+    }});
+    const html=renderToStaticMarkup(React.createElement(exports.DataImportExportView,{onNotify:()=>{}}));
+    const input=html.match(/<input[^>]+type="file"[^>]*>/)[0];
+    assert.equal(input.includes('disabled'),disabled);
+    assert.ok(input.includes('.xlsx,.csv'));
+  }
+});
+
+test('datas operacionais de timestamps UTC respeitam Bahia', async () => {
+  const {service}=setup({cloud:true,cloudStore:{stays:async()=>[{id:'s',check_in_expected:'2030-10-02T01:00:00Z',check_out_expected:'2030-10-02T15:00:00Z'}]}});
+  assert.equal((await service.fetchStays({date:'2030-10-01'})).length,1);
+});

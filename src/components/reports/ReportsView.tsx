@@ -5,6 +5,7 @@ import { formatCurrency } from '../../lib/formatters';
 import { FileSpreadsheet, TrendingUp, Users, BedDouble, DollarSign } from 'lucide-react';
 
 export const ReportsView: React.FC = () => {
+  const [error, setError] = useState('');
   const [stats, setStats] = useState({
     totalGuests: 0,
     totalStays: 0,
@@ -21,6 +22,7 @@ export const ReportsView: React.FC = () => {
 
   const calculateStats = async () => {
     try {
+      setError('');
       const { totalCount: totalG } = await dataService.fetchGuests({ pageSize: 1 });
       const stays = await dataService.fetchStays({});
       const rooms = await dataService.fetchRooms();
@@ -30,7 +32,7 @@ export const ReportsView: React.FC = () => {
         .filter(s => s.status === 'hospedado' || s.status === 'finalizada')
         .reduce((sum, s) => sum + (s.agreed_amount || 0), 0);
 
-      const occRate = rooms.length > 0 ? Math.round((active.length / rooms.length) * 100) : 0;
+      const occRate = rooms.filter(r => r.active).length > 0 ? Math.round((new Set(active.map(s => s.room_id)).size / rooms.filter(r => r.active).length) * 100) : 0;
 
       setStats({
         totalGuests: totalG,
@@ -40,12 +42,12 @@ export const ReportsView: React.FC = () => {
         occupancyRate: occRate
       });
     } catch (err) {
-      console.error('Error calculating report stats:', err);
+      setError((err as Error).message);
     }
   };
 
   return (
-    <div className="reports-view-container">
+    <div className="reports-view-container">{error && <p role="alert">Falha ao carregar relatório: {error}</p>}
       <div className="section-toolbar">
         <div className="toolbar-title-group">
           <h2>Relatórios & Resumo de Ocupação</h2>

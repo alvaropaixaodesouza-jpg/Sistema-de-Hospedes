@@ -1,3 +1,5 @@
+import { AuxiliaryView } from './components/settings/AuxiliaryView';
+import { DuplicatesView } from './components/guests/DuplicatesView';
 import { AccessGate } from './components/common/AccessGate';
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -157,14 +159,7 @@ const MainApp: React.FC = () => {
             />
           )}
 
-          {activeSection === 'hospedes_duplicidades' && (
-            <div className="pms-card">
-              <h3>Revisão de Duplicidades de Hóspedes</h3>
-              <p style={{ color: 'var(--slate-500)', fontSize: '13px', marginTop: '8px' }}>
-                Novos cadastros com CPF repetido são bloqueados. A revisão de duplicidades de registros antigos ainda precisa ser realizada.
-              </p>
-            </div>
-          )}
+          {activeSection === 'hospedes_duplicidades' && <DuplicatesView onSelect={setSelectedGuestForDrawer} />}
 
           {/* 3. HOSPEDAGENS */}
           {activeSection === 'hospedagens_chegadas' && (
@@ -225,16 +220,7 @@ const MainApp: React.FC = () => {
           )}
 
           {/* 7. CADASTROS AUXILIARES */}
-          {activeSection === 'cadastros' && (
-            <div className="pms-card">
-              <div className="section-toolbar" style={{ border: 'none', padding: 0, boxShadow: 'none' }}>
-                <div className="toolbar-title-group">
-                  <h2>Cadastros Auxiliares (Tipos de Acomodação & Formas de Pagamento)</h2>
-                  <p>Módulo de apoio operacional pré-configurado para a pousada</p>
-                </div>
-              </div>
-            </div>
-          )}
+          {activeSection === 'cadastros' && <AuxiliaryView />}
 
           {/* 8. RELATÓRIOS */}
           {activeSection === 'relatorios' && <ReportsView />}

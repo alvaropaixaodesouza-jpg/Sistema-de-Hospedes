@@ -92,7 +92,7 @@ export function getOperationalTimeString(dateInput?: Date | string): string {
 export function formatDatePTBR(dateString?: string): string {
   if (!dateString) return 'Data não informada';
   try {
-    const datePart = dateString.includes('T') ? dateString.split('T')[0] : dateString;
+    const datePart = dateString.includes('T') ? getOperationalDateString(dateString) : dateString;
     const [year, month, day] = datePart.split('-');
     if (year && month && day) {
       return `${day}/${month}/${year}`;
@@ -124,7 +124,7 @@ export function formatDateTimePTBR(isoString?: string): string {
 export function formatLongDatePTBR(dateString?: string): string {
   if (!dateString) return '';
   try {
-    const datePart = dateString.includes('T') ? dateString.split('T')[0] : dateString;
+    const datePart = dateString.includes('T') ? getOperationalDateString(dateString) : dateString;
     const d = new Date(`${datePart}T12:00:00-03:00`);
     return new Intl.DateTimeFormat('pt-BR', {
       weekday: 'long',

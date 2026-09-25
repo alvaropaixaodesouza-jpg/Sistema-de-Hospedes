@@ -67,8 +67,8 @@ export const DailyStaysView: React.FC<DailyStaysViewProps> = ({
   // 2. Hospedados Agora: Currently hosted (status === 'hospedado' OR active stay covering selectedDate)
   const hostedNow = stays.filter(s => {
     if (s.status !== 'hospedado') return false;
-    const checkInDay = s.check_in_expected.split('T')[0];
-    const checkOutDay = s.check_out_expected.split('T')[0];
+    const checkInDay = getOperationalDateString(s.check_in_expected);
+    const checkOutDay = getOperationalDateString(s.check_out_expected);
     return checkInDay <= selectedDate && checkOutDay >= selectedDate;
   });
 

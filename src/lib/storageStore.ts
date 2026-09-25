@@ -1,3 +1,4 @@
+import { ImportBatch } from './importData';
 import { cloudStore } from './cloudStore';
 import { Guest, Stay, Room, AuditLog, ImportHistoryItem, Payment, RoomType, PousadaConfig } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
@@ -160,6 +161,7 @@ interface LocalStoreSchema {
   auditLogs: AuditLog[];
   importHistory: ImportHistoryItem[];
   guestCodeSequence: number;
+  roomTypes?: RoomType[];
 }
 
 function getLocalStore(): LocalStoreSchema {
@@ -455,8 +457,8 @@ export const dataService = {
     if (params.date) {
       const targetDate = params.date;
       stays = stays.filter(s => {
-        const checkIn = s.check_in_expected.split('T')[0];
-        const checkOut = s.check_out_expected.split('T')[0];
+        const checkIn = getOperationalDateString(s.check_in_expected);
+        const checkOut = getOperationalDateString(s.check_out_expected);
         return checkIn <= targetDate && checkOut >= targetDate;
       });
     }
@@ -582,10 +584,11 @@ export const dataService = {
   },
 
   async importDataBatch(params: {
-    filename: string; guests: Partial<Guest>[]; stays: Partial<Stay>[]; rooms?: Partial<Room>[];
+    filename: string; guests: Partial<Guest>[]; stays: Partial<Stay>[]; rooms?: Partial<Room>[]; batchKey?: string; warnings?: string[]; sourceRows?: Record<string, unknown>[];
   }): Promise<{ importedGuestsCount: number; importedStaysCount: number }> {
-    requireLocalMode();
+    if (isSupabaseConfigured) return cloudStore.importDataBatch(params);
     const store = getLocalStore();
+    if (params.batchKey && store.importHistory.some(h => h.details?.batchKey === params.batchKey)) return { importedGuestsCount: 0, importedStaysCount: 0 };
     const now = new Date().toISOString();
     const guestMap = new Map<string, string>();
     const roomMap = new Map<string, string>();
@@ -612,8 +615,8 @@ export const dataService = {
     for (const entry of params.stays) {
       const guest_id = guestMap.get(entry.guest_id || '') || entry.guest_id;
       const room_id = roomMap.get(entry.room_id || '') || entry.room_id;
-      const imported: Stay = { ...entry, id: entry.id || crypto.randomUUID(), pousada_id: store.config.id, guest_id: guest_id!, room_id: room_id!, check_in_expected: entry.check_in_expected!, check_out_expected: entry.check_out_expected!, party_size: entry.party_size || 1, agreed_amount: entry.agreed_amount || 0, status: entry.status || 'finalizada', created_at: entry.created_at || now, updated_at: now };
-      const existing = store.stays.find(s => s.id === imported.id);
+      const imported: Stay = { ...entry, id: params.batchKey ? `${params.batchKey}-${entry.id}` : entry.id || crypto.randomUUID(), pousada_id: store.config.id, guest_id: guest_id!, room_id: room_id!, check_in_expected: entry.check_in_expected!, check_out_expected: entry.check_out_expected!, party_size: entry.party_size || 1, agreed_amount: entry.agreed_amount || 0, status: entry.status || 'finalizada', created_at: entry.created_at || now, updated_at: now };
+      const existing = store.stays.find(s => s.id === imported.id || (s.guest_id === imported.guest_id && s.room_id === imported.room_id && Date.parse(s.check_in_expected) === Date.parse(imported.check_in_expected) && Date.parse(s.check_out_expected) === Date.parse(imported.check_out_expected)));
       if (existing) {
         if (existing.guest_id !== imported.guest_id || existing.room_id !== imported.room_id || existing.check_in_expected !== imported.check_in_expected || existing.check_out_expected !== imported.check_out_expected) throw new Error('Identificador de hospedagem já utilizado com outros dados.');
         continue;
@@ -622,11 +625,36 @@ export const dataService = {
       store.stays.push(imported);
       importedStaysCount++;
     }
-    store.importHistory.unshift({ id: crypto.randomUUID(), pousada_id: store.config.id, filename: params.filename, total_rows: params.guests.length + params.stays.length, imported_guests: importedGuestsCount, imported_stays: importedStaysCount, status: 'sucesso', created_at: now });
+    store.importHistory.unshift({ id: crypto.randomUUID(), pousada_id: store.config.id, filename: params.filename, total_rows: params.guests.length + params.stays.length, imported_guests: importedGuestsCount, imported_stays: importedStaysCount, status: 'sucesso', details: { batchKey: params.batchKey, warnings: params.warnings, sourceRows: params.sourceRows }, created_at: now });
     saveLocalStore(store);
     return { importedGuestsCount, importedStaysCount };
   },
 
+  async fetchRoomTypes(): Promise<RoomType[]> {
+    return isSupabaseConfigured ? cloudStore.roomTypes() : getLocalStore().roomTypes || [];
+  },
+  async saveRoomType(value: { id?: string; name: string; description?: string; default_price: number }): Promise<RoomType> {
+    if (!value.name.trim() || !Number.isFinite(value.default_price) || value.default_price < 0) throw new Error('Informe nome e preço válido.');
+    if (isSupabaseConfigured) return cloudStore.saveRoomType(value);
+    const store = getLocalStore();
+    const types = store.roomTypes || [];
+    if (types.some(t => t.id !== value.id && t.name.toLowerCase() === value.name.trim().toLowerCase())) throw new Error('Tipo de acomodação já cadastrado.');
+    const saved = { ...value, name:value.name.trim(), id:value.id || crypto.randomUUID(), pousada_id:store.config.id };
+    store.roomTypes = [...types.filter(t=>t.id !== saved.id),saved]; saveLocalStore(store); return saved;
+  },
+  async fetchImportHistory(): Promise<ImportHistoryItem[]> {
+    return isSupabaseConfigured ? cloudStore.importHistory() : getLocalStore().importHistory;
+  },
+  async fetchConfig(): Promise<PousadaConfig> {
+    return isSupabaseConfigured ? cloudStore.config() : getLocalStore().config;
+  },
+  async saveConfig(config: PousadaConfig): Promise<PousadaConfig> {
+    if (!config.name?.trim()) throw new Error('Informe o nome da pousada.');
+    for (const time of [config.default_checkin_time, config.default_checkout_time]) if (!/^([01]\d|2[0-3]):[0-5]\d(:00)?$/.test(time)) throw new Error('Horário inválido.');
+    const { id, ...fields } = config;
+    if (isSupabaseConfigured) return cloudStore.saveConfig(fields);
+    const store = getLocalStore(); store.config = { ...config, id: store.config.id }; saveLocalStore(store); return store.config;
+  },
   async exportFullDataJSON(): Promise<string> {
     if (isSupabaseConfigured) return cloudStore.exportBackup();
     const store = getLocalStore();
